@@ -12,20 +12,29 @@ public class OrbitManager : MonoBehaviour
     public float axialTilt = 23f;
     [Header("Time Values")]
     public int yearTimeInSeconds = 20;
-    private Vector3 yearAngle = new Vector3(0.0f, 360.0f, 0.0f);
+    private Vector3 revolution = new Vector3(0.0f, 360.0f, 0.0f);
 
     //Private Variables
-    private float stepAngle;
+    private float stepAngleYear;
+    private float stepAngleDay;
+
 
     private void Awake()
     {
-        stepAngle = 360 / ((yearTimeInSeconds*1000) / 1000f);
+        float dayTimeInSeconds = yearTimeInSeconds/365.00f;
+        stepAngleYear = 360 / yearTimeInSeconds;
+        stepAngleDay = 360.00f / dayTimeInSeconds;
+
+        Debug.Log(yearTimeInSeconds);
+        Debug.Log(dayTimeInSeconds);
     }
     void FixedUpdate()
     {
-        if (TimeManager.isTimePaused == false)
+        //if (TimeManager.isTimePaused == false)
         {
-                Sun.transform.Rotate(yearAngle, stepAngle * Time.fixedDeltaTime);
+                //Sun.transform.Rotate(revolution, stepAngleYear * Time.fixedDeltaTime);
+                Earth.transform.Rotate(revolution, stepAngleYear * Time.fixedDeltaTime, Space.World);
+                Earth.transform.Rotate(revolution, stepAngleDay * Time.fixedDeltaTime, Space.Self);
         }
     }
 }
