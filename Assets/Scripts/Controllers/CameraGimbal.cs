@@ -21,7 +21,9 @@ public class CameraGimbal : MonoBehaviour
     public float zoomSpeedFactor = 1;
     public float zoomUpperBound = 50;
     public float zoomLowerBound = -12;
+    public float lowMoveSpeedFactor = 0.5f;
     public GameObject gimbalCamera;
+    private float cameraDist;
 
     // Not used in this code - kept in case your planning to do panning or something
     /*
@@ -36,7 +38,7 @@ public class CameraGimbal : MonoBehaviour
 
     // Speed of camera rotation - aka sensitivity
     [Min(1)]
-    public float rotSpeed = 10f;
+    public float rotationSpeed = 10f;
     // When the mouse is released, how fast the motion slows
     [Min(0.1f)]
     public float friction;
@@ -52,10 +54,16 @@ public class CameraGimbal : MonoBehaviour
     // Magnitude of rotation for after mouse release, decreases over time
     private float rotMagnitude;
 
+    void Awake()
+    {
+        InitialiseCamera();
+        rotationSpeed = CameraAdjust();
+    }
 
     // Update is called once per frame
     void Update()
     {
+       
         if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
         {
             CameraZoom(-1 * zoomSpeedFactor);
@@ -81,7 +89,7 @@ public class CameraGimbal : MonoBehaviour
             if (yInvert) delta.y = -delta.y;
 
             // Whenever we make any translations or rotations in Update, we *must* multiply by Time.deltaTime - or suffer problems like FO76
-            delta *= Time.deltaTime * rotSpeed;
+            delta *= Time.deltaTime * rotationSpeed;
 
             // Get the starting rotations horizontally and vertically so to calculate a frame delta later
             float startFrameHorizontalRot = horizontalGimbal.eulerAngles.y;
@@ -131,10 +139,6 @@ public class CameraGimbal : MonoBehaviour
     }
     void CameraZoom(float zoomDir)
     {
-        Vector3 cameraPosition = gimbalCamera.transform.position;
-        Vector3 worldOrigin = new Vector3(0, 0, 0);
-        float cameraDist = Vector3.Distance(cameraPosition, worldOrigin);
-
         if (zInvert)
         {
             zoomDir =  -zoomDir;
@@ -145,8 +149,23 @@ public class CameraGimbal : MonoBehaviour
         }
         gimbalCamera.transform.Translate(0, 0, zoomDir, Space.Self);
 
+        /*ENABLE FOR DEBUG
         Debug.Log(("Camera at upper bound = ") + (cameraDist >= zoomUpperBound && zoomDir == -1));
-        Debug.Log(("Camera at lower bound = ") + (cameraDist <= zoomLowerBound && zoomDir == 1));
+        Debug.Log(("Camera at lower bound = ") + (cameraDist <= zoomLowerBound && zoomDir == 1));*/
     }
+    float CameraAdjust()
+    {
+        float zoomDelta = zoomUpperBound - zoomLowerBound;
+        float zoomMultiplier = (cameraDist - zoomLowerBound) / zoomDelta;
+        rotationSpeed = (rotationSpeed * (zoomMultiplier + lowMoveSpeedFactor));
+        return rotationSpeed;
+    }
+    void InitialiseCamera()
+    {
+        Vector3 cameraPosition = gimbalCamera.transform.position;
+        Vector3 gimbalPosition = GameObject.Find("CameraGimbal").transform.position;
+        cameraDist = Vector3.Distance(cameraPosition, gimbalPosition);
+    }
+    
 }
     
