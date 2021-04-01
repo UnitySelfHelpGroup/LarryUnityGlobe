@@ -33,8 +33,8 @@ public class OrbitManager : MonoBehaviour
         //if (TimeManager.isTimePaused == false)
         {
                 //Sun.transform.Rotate(revolution, stepAngleYear * Time.fixedDeltaTime);
-                Earth.transform.Rotate(revolution, stepAngleYear * Time.fixedDeltaTime, Space.World);
-                Earth.transform.Rotate(revolution, stepAngleDay * Time.fixedDeltaTime, Space.Self);
+                Earth.transform.Rotate(revolution, stepAngleYear * TimeWizard.i.DeltaTime, Space.World);
+                Earth.transform.Rotate(revolution, stepAngleDay * TimeWizard.i.DeltaTime, Space.Self);
         }
     }
 }

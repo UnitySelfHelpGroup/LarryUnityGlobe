@@ -58,3 +58,5 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+Assets/Textures/HDRIs/starmap_2020_16k_gal.exr
+*.exr

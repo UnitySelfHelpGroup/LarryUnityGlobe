@@ -19,8 +19,8 @@ public class CameraGimbal : MonoBehaviour
     public bool yInvert = false;
     public bool zInvert = false;
     public float zoomSpeedFactor = 1;
-    public float zoomUpperBound;
-    public float zoomLowerBound;
+    public float zoomUpperBound = 50;
+    public float zoomLowerBound = -12;
     public GameObject gimbalCamera;
 
     // Not used in this code - kept in case your planning to do panning or something
@@ -58,12 +58,12 @@ public class CameraGimbal : MonoBehaviour
     {
         if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
         {
-            CameraZoom(-1);
+            CameraZoom(-1 * zoomSpeedFactor);
         }
 
         if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
         {
-            CameraZoom(1);
+            CameraZoom(1 * zoomSpeedFactor);
         }
 
         if (Input.GetButtonDown("Fire1"))
@@ -131,11 +131,22 @@ public class CameraGimbal : MonoBehaviour
     }
     void CameraZoom(float zoomDir)
     {
+        Vector3 cameraPosition = gimbalCamera.transform.position;
+        Vector3 worldOrigin = new Vector3(0, 0, 0);
+        float cameraDist = Vector3.Distance(cameraPosition, worldOrigin);
+
         if (zInvert)
         {
             zoomDir =  -zoomDir;
         }
+        if ((cameraDist >= zoomUpperBound && zoomDir == -1) || (cameraDist <= zoomLowerBound && zoomDir == 1))
+        {
+            zoomDir = 0;
+        }
         gimbalCamera.transform.Translate(0, 0, zoomDir, Space.Self);
+
+        Debug.Log(("Camera at upper bound = ") + (cameraDist >= zoomUpperBound && zoomDir == -1));
+        Debug.Log(("Camera at lower bound = ") + (cameraDist <= zoomLowerBound && zoomDir == 1));
     }
 }
     
